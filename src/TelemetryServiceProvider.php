@@ -6,6 +6,7 @@ use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
 use Softbean\Telemetry\Client\HubClient;
+use Softbean\Telemetry\Console\AuditCommand;
 use Softbean\Telemetry\Console\FlushOutboxCommand;
 use Softbean\Telemetry\Console\HeartbeatCommand;
 use Softbean\Telemetry\Console\TestConnectionCommand;
@@ -46,6 +47,7 @@ class TelemetryServiceProvider extends ServiceProvider
 
         if ($this->app->runningInConsole()) {
             $this->commands([
+                AuditCommand::class,
                 FlushOutboxCommand::class,
                 HeartbeatCommand::class,
                 TestConnectionCommand::class,
@@ -87,6 +89,14 @@ class TelemetryServiceProvider extends ServiceProvider
             $schedule->command(HeartbeatCommand::class)
                 ->everyFiveMinutes()
                 ->withoutOverlapping();
+
+            // Semanal e de madrugada: o composer audit puxa a base de
+            // advisories pela rede e a leitura de schema percorre todas as
+            // migrations. Nenhum dos dois muda de hora em hora.
+            $schedule->command(AuditCommand::class)
+                ->weeklyOn(1, '03:20')
+                ->withoutOverlapping()
+                ->runInBackground();
         });
     }
 }

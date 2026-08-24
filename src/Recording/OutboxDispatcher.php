@@ -21,6 +21,17 @@ class OutboxDispatcher
         'metrics' => ['/api/ingest/metrics', 'metricas'],
         'ai-usage' => ['/api/ingest/ai-usage', 'chamadas'],
         'tenants' => ['/api/ingest/tenants', 'tenants'],
+        'security-findings' => ['/api/ingest/security-findings', 'varreduras'],
+        'schema' => ['/api/ingest/schema', 'leituras'],
+    ];
+
+    /**
+     * Uma varredura inteira num item só: mandar cinco de uma vez estouraria o
+     * corpo da requisição sem ganho nenhum, já que o hub só precisa da última.
+     */
+    private const TAMANHO_POR_TIPO = [
+        'security-findings' => 1,
+        'schema' => 1,
     ];
 
     public function __construct(
@@ -37,7 +48,6 @@ class OutboxDispatcher
             return ['enviados' => 0, 'falhas' => 0, 'mensagens' => ['Telemetria desligada ou sem configuração.']];
         }
 
-        $tamanho = (int) config('softbean-telemetry.outbox.tamanho_do_lote', 200);
         $enviados = 0;
         $falhas = 0;
         $mensagens = [];
@@ -48,6 +58,7 @@ class OutboxDispatcher
             }
 
             [$rota, $chave] = self::ROTAS[$tipo];
+            $tamanho = self::TAMANHO_POR_TIPO[$tipo] ?? (int) config('softbean-telemetry.outbox.tamanho_do_lote', 200);
 
             // Enquanto houver pendência daquele tipo, segue mandando: um
             // produto que ficou horas sem hub tem backlog para drenar.
