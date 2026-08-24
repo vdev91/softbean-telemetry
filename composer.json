@@ -1,0 +1,27 @@
+{
+    "name": "softbean/telemetry",
+    "description": "Cliente de auditoria e telemetria dos produtos Softbean. Envia trilha de auditoria, saude, metricas de uso e custo de IA para o Softbean Desk.",
+    "type": "library",
+    "license": "proprietary",
+    "version": "1.0.0",
+    "require": {
+        "php": "^8.2",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/http": "^11.0|^12.0|^13.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Softbean\\Telemetry\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Softbean\\Telemetry\\TelemetryServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true
+}
