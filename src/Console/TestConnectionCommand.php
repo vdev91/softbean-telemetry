@@ -88,7 +88,12 @@ class TestConnectionCommand extends Command
             );
 
             if (! $rotaRegistrada) {
-                $problemas[] = 'Rode: php artisan optimize  (config:cache sozinho não reconstrói as rotas)';
+                // config:clear ANTES, e não só optimize: o processo do optimize
+                // boota com o cache de config antigo — o que ainda diz que a
+                // telemetria está desligada — e monta a coleção de rotas sem a
+                // rota de saúde antes de cachear. Limpar a config primeiro faz
+                // o boot seguinte ler o .env de verdade.
+                $problemas[] = 'Rode: php artisan config:clear && php artisan optimize';
             }
         }
 

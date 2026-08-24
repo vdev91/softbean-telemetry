@@ -25,13 +25,15 @@ SOFTBEAN_TELEMETRIA_ATIVA=true
 Confira:
 
 ```bash
-php artisan optimize
+php artisan config:clear && php artisan optimize
 php artisan softbean:testar-conexao
 ```
 
-O `optimize` refaz config E rotas. So `config:cache` deixaria a rota de saude
-fora do cache, e o hub enxergaria o produto como fora do ar mesmo com a
-ingestao funcionando.
+O config:clear vem antes de proposito: o processo do optimize boota com o
+cache de config antigo, que ainda diz que a telemetria esta desligada, e monta
+a colecao de rotas sem a rota de saude antes de cachear. Sem limpar a config
+primeiro, o hub enxerga o produto como fora do ar mesmo com a ingestao
+funcionando.
 
 ## O que ja funciona sem escrever codigo
 
