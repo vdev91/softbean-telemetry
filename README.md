@@ -25,8 +25,13 @@ SOFTBEAN_TELEMETRIA_ATIVA=true
 Confira:
 
 ```bash
+php artisan optimize
 php artisan softbean:testar-conexao
 ```
+
+O `optimize` refaz config E rotas. So `config:cache` deixaria a rota de saude
+fora do cache, e o hub enxergaria o produto como fora do ar mesmo com a
+ingestao funcionando.
 
 ## O que ja funciona sem escrever codigo
 

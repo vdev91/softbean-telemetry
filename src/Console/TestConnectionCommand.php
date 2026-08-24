@@ -3,6 +3,7 @@
 namespace Softbean\Telemetry\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Softbean\Telemetry\Client\HubClient;
 use Softbean\Telemetry\Support\EnvironmentProbe;
@@ -71,6 +72,24 @@ class TestConnectionCommand extends Command
 
         if (! $temTabela) {
             $problemas[] = 'Rode: php artisan migrate';
+        }
+
+        // A rota de saúde só é registrada com a telemetria ligada. Se as rotas
+        // foram cacheadas antes disso — o que sempre acontece, porque o deploy
+        // roda optimize e o .env vem depois — ela fica de fora do cache e o hub
+        // enxerga o produto como fora do ar mesmo com a ingestão funcionando.
+        if ($ativo && config('softbean-telemetry.saude.rota_ativa', true)) {
+            $rotaRegistrada = Route::has('softbean.health');
+
+            $this->linha(
+                'Rota /_softbean/health',
+                $rotaRegistrada,
+                $rotaRegistrada ? 'registrada' : 'fora do cache de rotas'
+            );
+
+            if (! $rotaRegistrada) {
+                $problemas[] = 'Rode: php artisan optimize  (config:cache sozinho não reconstrói as rotas)';
+            }
         }
 
         $this->newLine();
